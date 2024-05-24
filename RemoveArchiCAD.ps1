@@ -7,37 +7,31 @@ $directories = @(
     "$env:AppData\GRAPHISOFT"
 )
 
-# Цветовые коды ANSI для подсветки
-$colorReset = "`e[0m"
-$colorGreen = "`e[32m"
-$colorRed = "`e[31m"
-$colorYellow = "`e[33m"
-
 # Функция для логирования
 function Write-Log {
     param (
         [string]$message,
-        [string]$color = $colorReset
+        [string]$color
     )
     $timestamp = Get-Date -Format "HH:mm:ss"
     $logMessage = "$timestamp - $message"
-    Write-Host "$color$logMessage$colorReset"
+    Write-Host $logMessage -ForegroundColor $color
     Add-Content -Path "C:\Backup\cleanup_log.txt" -Value $logMessage
 }
 
 # Определение функций для поиска и удаления папок
 function Remove-Folders {
     param ([string[]]$folders)
-    Write-Log "--- Start removing folders ---" $colorYellow
+    Write-Log "--- Start removing folders ---" Yellow
     foreach ($folder in $folders) {
         if (Test-Path -Path $folder) {
             Remove-Item -Path $folder -Recurse -Force
-            Write-Log "┝ Removed folder: $folder" $colorGreen
+            Write-Log "┝ Removed folder: $folder" Green
         } else {
-            Write-Log "┝ Folder not found: $folder" $colorRed
+            Write-Log "┝ Folder not found: $folder" Red
         }
     }
-    Write-Log "--- End removing folders ---" $colorYellow
+    Write-Log "--- End removing folders ---" Yellow
 }
 
 # Функция для резервного копирования раздела реестра
@@ -48,9 +42,9 @@ function Backup-RegistryKey {
     )
     try {
         Export-RegistryKey -Path $key -LiteralPath $backupPath
-        Write-Log "┝ Registry backup saved: $backupPath" $colorGreen
+        Write-Log "┝ Registry backup saved: $backupPath" Green
     } catch {
-        Write-Log "┝ Error backing up registry key: $key" $colorRed
+        Write-Log "┝ Error backing up registry key: $key" Red
     }
 }
 
@@ -64,19 +58,19 @@ $registryPaths = @(
 # Функция для очистки реестра
 function Remove-RegistryKeys {
     param ([string[]]$keys)
-    Write-Log "--- Start cleaning registry ---" $colorYellow
+    Write-Log "--- Start cleaning registry ---" Yellow
     foreach ($key in $keys) {
         $backupPath = "C:\Backup\$(($key -replace ':', '') -replace '\\', '_').reg"
         Backup-RegistryKey -key $key -backupPath $backupPath
 
         if (Test-Path -Path $key) {
             Remove-Item -Path $key -Recurse -Force
-            Write-Log "┝ Removed registry key: $key" $colorGreen
+            Write-Log "┝ Removed registry key: $key" Green
         } else {
-            Write-Log "┝ Registry key not found: $key" $colorRed
+            Write-Log "┝ Registry key not found: $key" Red
         }
     }
-    Write-Log "--- End cleaning registry ---" $colorYellow
+    Write-Log "--- End cleaning registry ---" Yellow
 }
 
 # Удаление записей ArchiCAD из списка установленных программ
@@ -88,7 +82,7 @@ $uninstallPaths = @(
 # Функция для удаления записей из списка установленных программ
 function Remove-UninstallEntries {
     param ([string[]]$paths)
-    Write-Log "--- Start removing uninstall entries ---" $colorYellow
+    Write-Log "--- Start removing uninstall entries ---" Yellow
     foreach ($path in $paths) {
         $subKeys = Get-ChildItem -Path $path
         foreach ($subKey in $subKeys) {
@@ -98,17 +92,17 @@ function Remove-UninstallEntries {
                 Backup-RegistryKey -key $subKey.PSPath -backupPath $backupPath
 
                 Remove-Item -Path $subKey.PSPath -Recurse -Force
-                Write-Log "┝ Removed uninstall entry: $displayName" $colorGreen
+                Write-Log "┝ Removed uninstall entry: $displayName" Green
             }
         }
     }
-    Write-Log "--- End removing uninstall entries ---" $colorYellow
+    Write-Log "--- End removing uninstall entries ---" Yellow
 }
 
 # Создание директории для резервных копий, если она не существует
 if (-not (Test-Path -Path "C:\Backup")) {
     New-Item -ItemType Directory -Path "C:\Backup"
-    Write-Log "Created backup directory: C:\Backup" $colorGreen
+    Write-Log "Created backup directory: C:\Backup" Green
 }
 
 # Запуск удаления папок
@@ -120,4 +114,4 @@ Remove-RegistryKeys -keys $registryPaths
 # Запуск удаления записей из списка установленных программ
 Remove-UninstallEntries -paths $uninstallPaths
 
-Write-Log "--- Script completed ---" $colorYellow
+Write-Log "--- Script completed ---" Yellow
