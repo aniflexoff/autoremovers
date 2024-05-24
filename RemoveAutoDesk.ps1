@@ -34,6 +34,7 @@ function Stop-AutodeskProcesses {
         }
     }
     Write-Log "--- End stopping Autodesk processes ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Функция для остановки и отключения служб Autodesk
@@ -50,6 +51,7 @@ function Stop-AutodeskServices {
         }
     }
     Write-Log "--- End stopping Autodesk services ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Определение функций для поиска и удаления папок
@@ -65,6 +67,7 @@ function Remove-Folders {
         }
     }
     Write-Log "--- End removing folders ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Функция для резервного копирования раздела реестра
@@ -91,6 +94,7 @@ $registryPaths = @(
 # Функция для очистки реестра
 function Remove-RegistryKeys {
     param ([string[]]$keys)
+    Write-Host  # Добавляем пустую строку
     Write-Log "--- Start cleaning registry ---" Yellow
     foreach ($key in $keys) {
         $backupPath = "C:\Backup\$(($key -replace ':', '') -replace '\\', '_').reg"
@@ -104,6 +108,7 @@ function Remove-RegistryKeys {
         }
     }
     Write-Log "--- End cleaning registry ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Удаление записей AutoDesk из списка установленных программ
@@ -130,6 +135,7 @@ function Remove-UninstallEntries {
         }
     }
     Write-Log "--- End removing uninstall entries ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Создание директории для резервных копий, если она не существует
