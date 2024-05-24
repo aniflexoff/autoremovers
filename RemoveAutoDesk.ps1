@@ -9,69 +9,62 @@ $directories = @(
     "$env:ProgramFiles(x86)\Common Files\Autodesk Shared"
 )
 
-# Цветовые коды ANSI для подсветки
-$env:TERM="xterm"
-$colorReset = "`e[0m"
-$colorGreen = "`e[32m"
-$colorRed = "`e[31m"
-$colorYellow = "`e[33m"
-
 # Функция для логирования
 function Write-Log {
     param (
         [string]$message,
-        [string]$color = $colorReset
+        [string]$color
     )
     $timestamp = Get-Date -Format "HH:mm:ss"
     $logMessage = "$timestamp - $message"
-    Write-Host "$color$logMessage$colorReset"
+    Write-Host $logMessage -ForegroundColor $color
     Add-Content -Path "C:\Backup\cleanup_log.txt" -Value $logMessage
 }
 
 # Функция для завершения процессов Autodesk
 function Stop-AutodeskProcesses {
-    Write-Log "--- Start stopping Autodesk processes ---" $colorYellow
+    Write-Log "--- Start stopping Autodesk processes ---" Yellow
     $processes = Get-Process | Where-Object { $_.Name -match "acad|autodesk|revit|3dsmax" }
     foreach ($process in $processes) {
         try {
             Stop-Process -Id $process.Id -Force
-            Write-Log "  ┝ Stopped process: $($process.Name) (ID: $($process.Id))" $colorGreen
+            Write-Log "  ┝ Stopped process: $($process.Name) (ID: $($process.Id))" Green
         } catch {
-            Write-Log "  ┝ Failed to stop process: $($process.Name) (ID: $($process.Id))" $colorRed
+            Write-Log "  ┝ Failed to stop process: $($process.Name) (ID: $($process.Id))" Red
         }
     }
-    Write-Log "--- End stopping Autodesk processes ---" $colorYellow
+    Write-Log "--- End stopping Autodesk processes ---" Yellow
 }
 
 # Функция для остановки и отключения служб Autodesk
 function Stop-AutodeskServices {
-    Write-Log "--- Start stopping Autodesk services ---" $colorYellow
+    Write-Log "--- Start stopping Autodesk services ---" Yellow
     $services = Get-Service | Where-Object { $_.Name -eq "Autodesk" }
     foreach ($service in $services) {
         try {
             Stop-Service -Name $service.Name -Force
             Set-Service -Name $service.Name -StartupType Disabled
-            Write-Log "  ┝ Stopped and disabled service: $($service.Name)" $colorGreen
+            Write-Log "  ┝ Stopped and disabled service: $($service.Name)" Green
         } catch {
-            Write-Log "  ┝ Failed to stop or disable service: $($service.Name)" $colorRed
+            Write-Log "  ┝ Failed to stop or disable service: $($service.Name)" Red
         }
     }
-    Write-Log "--- End stopping Autodesk services ---" $colorYellow
+    Write-Log "--- End stopping Autodesk services ---" Yellow
 }
 
 # Определение функций для поиска и удаления папок
 function Remove-Folders {
     param ([string[]]$folders)
-    Write-Log "--- Start removing folders ---" $colorYellow
+    Write-Log "--- Start removing folders ---" Yellow
     foreach ($folder in $folders) {
         if (Test-Path -Path $folder) {
             Remove-Item -Path $folder -Recurse -Force
-            Write-Log "  ┝ Removed folder: $folder" $colorGreen
+            Write-Log "  ┝ Removed folder: $folder" Green
         } else {
-            Write-Log "  ┝ Folder not found: $folder" $colorRed
+            Write-Log "  ┝ Folder not found: $folder" Red
         }
     }
-    Write-Log "--- End removing folders ---" $colorYellow
+    Write-Log "--- End removing folders ---" Yellow
 }
 
 # Функция для резервного копирования раздела реестра
@@ -82,9 +75,9 @@ function Backup-RegistryKey {
     )
     try {
         Export-RegistryKey -Path $key -LiteralPath $backupPath
-        Write-Log "  ┝ Registry backup saved: $backupPath" $colorGreen
+        Write-Log "  ┝ Registry backup saved: $backupPath" Green
     } catch {
-        Write-Log "  ┝ Error backing up registry key: $key" $colorRed
+        Write-Log "  ┝ Error backing up registry key: $key" Red
     }
 }
 
@@ -98,19 +91,19 @@ $registryPaths = @(
 # Функция для очистки реестра
 function Remove-RegistryKeys {
     param ([string[]]$keys)
-    Write-Log "--- Start cleaning registry ---" $colorYellow
+    Write-Log "--- Start cleaning registry ---" Yellow
     foreach ($key in $keys) {
         $backupPath = "C:\Backup\$(($key -replace ':', '') -replace '\\', '_').reg"
         Backup-RegistryKey -key $key -backupPath $backupPath
 
         if (Test-Path -Path $key) {
             Remove-Item -Path $key -Recurse -Force
-            Write-Log "  ┝ Removed registry key: $key" $colorGreen
+            Write-Log "  ┝ Removed registry key: $key" Green
         } else {
-            Write-Log "  ┝ Registry key not found: $key" $colorRed
+            Write-Log "  ┝ Registry key not found: $key" Red
         }
     }
-    Write-Log "--- End cleaning registry ---" $colorYellow
+    Write-Log "--- End cleaning registry ---" Yellow
 }
 
 # Удаление записей AutoDesk из списка установленных программ
@@ -122,7 +115,7 @@ $uninstallPaths = @(
 # Функция для удаления записей из списка установленных программ
 function Remove-UninstallEntries {
     param ([string[]]$paths)
-    Write-Log "--- Start removing uninstall entries ---" $colorYellow
+    Write-Log "--- Start removing uninstall entries ---" Yellow
     foreach ($path in $paths) {
         $subKeys = Get-ChildItem -Path $path
         foreach ($subKey in $subKeys) {
@@ -132,17 +125,17 @@ function Remove-UninstallEntries {
                 Backup-RegistryKey -key $subKey.PSPath -backupPath $backupPath
 
                 Remove-Item -Path $subKey.PSPath -Recurse -Force
-                Write-Log "  ┝ Removed uninstall entry: $displayName" $colorGreen
+                Write-Log "  ┝ Removed uninstall entry: $displayName" Green
             }
         }
     }
-    Write-Log "--- End removing uninstall entries ---" $colorYellow
+    Write-Log "--- End removing uninstall entries ---" Yellow
 }
 
 # Создание директории для резервных копий, если она не существует
 if (-not (Test-Path -Path "C:\Backup")) {
     New-Item -ItemType Directory -Path "C:\Backup"
-    Write-Log "Created backup directory: C:\Backup" $colorGreen
+    Write-Log "Created backup directory: C:\Backup" Green
 }
 
 # Завершение процессов Autodesk
@@ -160,4 +153,4 @@ Remove-RegistryKeys -keys $registryPaths
 # Запуск удаления записей из списка установленных программ
 Remove-UninstallEntries -paths $uninstallPaths
 
-Write-Log "--- Script completed ---" $colorYellow
+Write-Log "--- Script completed ---" Yellow
