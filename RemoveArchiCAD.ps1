@@ -26,12 +26,13 @@ function Remove-Folders {
     foreach ($folder in $folders) {
         if (Test-Path -Path $folder) {
             Remove-Item -Path $folder -Recurse -Force
-            Write-Log "┝ Removed folder: $folder" Green
+            Write-Log "  ┝ Removed folder: $folder" Green
         } else {
-            Write-Log "┝ Folder not found: $folder" Red
+            Write-Log "  ┝ Folder not found: $folder" Red
         }
     }
     Write-Log "--- End removing folders ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Функция для резервного копирования раздела реестра
@@ -42,9 +43,9 @@ function Backup-RegistryKey {
     )
     try {
         Export-RegistryKey -Path $key -LiteralPath $backupPath
-        Write-Log "┝ Registry backup saved: $backupPath" Green
+        Write-Log "  ┝ Registry backup saved: $backupPath" Green
     } catch {
-        Write-Log "┝ Error backing up registry key: $key" Red
+        Write-Log "  ┝ Error backing up registry key: $key" Red
     }
 }
 
@@ -65,12 +66,13 @@ function Remove-RegistryKeys {
 
         if (Test-Path -Path $key) {
             Remove-Item -Path $key -Recurse -Force
-            Write-Log "┝ Removed registry key: $key" Green
+            Write-Log "  ┝ Removed registry key: $key" Green
         } else {
-            Write-Log "┝ Registry key not found: $key" Red
+            Write-Log "  ┝ Registry key not found: $key" Red
         }
     }
     Write-Log "--- End cleaning registry ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Удаление записей ArchiCAD из списка установленных программ
@@ -92,11 +94,12 @@ function Remove-UninstallEntries {
                 Backup-RegistryKey -key $subKey.PSPath -backupPath $backupPath
 
                 Remove-Item -Path $subKey.PSPath -Recurse -Force
-                Write-Log "┝ Removed uninstall entry: $displayName" Green
+                Write-Log "  ┝ Removed uninstall entry: $displayName" Green
             }
         }
     }
     Write-Log "--- End removing uninstall entries ---" Yellow
+    Write-Host  # Добавляем пустую строку
 }
 
 # Создание директории для резервных копий, если она не существует
