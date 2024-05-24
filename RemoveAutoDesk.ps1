@@ -34,9 +34,9 @@ function Stop-AutodeskProcesses {
     foreach ($process in $processes) {
         try {
             Stop-Process -Id $process.Id -Force
-            Write-Log "┝ Stopped process: $($process.Name) (ID: $($process.Id))" $colorGreen
+            Write-Log "ㅤ┝ Stopped process: $($process.Name) (ID: $($process.Id))" $colorGreen
         } catch {
-            Write-Log "┝ Failed to stop process: $($process.Name) (ID: $($process.Id))" $colorRed
+            Write-Log "ㅤ┝ Failed to stop process: $($process.Name) (ID: $($process.Id))" $colorRed
         }
     }
     Write-Log "--- End stopping Autodesk processes ---" $colorYellow
@@ -50,9 +50,9 @@ function Stop-AutodeskServices {
         try {
             Stop-Service -Name $service.Name -Force
             Set-Service -Name $service.Name -StartupType Disabled
-            Write-Log "  ┝ Stopped and disabled service: $($service.Name)" $colorGreen
+            Write-Log "ㅤ┝ Stopped and disabled service: $($service.Name)" $colorGreen
         } catch {
-            Write-Log "  ┝ Failed to stop or disable service: $($service.Name)" $colorRed
+            Write-Log "ㅤ┝ Failed to stop or disable service: $($service.Name)" $colorRed
         }
     }
     Write-Log "--- End stopping Autodesk services ---" $colorYellow
@@ -65,9 +65,9 @@ function Remove-Folders {
     foreach ($folder in $folders) {
         if (Test-Path -Path $folder) {
             Remove-Item -Path $folder -Recurse -Force
-            Write-Log "  ┝ Removed folder: $folder" $colorGreen
+            Write-Log "ㅤ┝ Removed folder: $folder" $colorGreen
         } else {
-            Write-Log "  ┝ Folder not found: $folder" $colorRed
+            Write-Log "ㅤ┝ Folder not found: $folder" $colorRed
         }
     }
     Write-Log "--- End removing folders ---" $colorYellow
@@ -81,9 +81,9 @@ function Backup-RegistryKey {
     )
     try {
         Export-RegistryKey -Path $key -LiteralPath $backupPath
-        Write-Log "  ┝ Registry backup saved: $backupPath" $colorGreen
+        Write-Log "ㅤ┝ Registry backup saved: $backupPath" $colorGreen
     } catch {
-        Write-Log "  ┝ Error backing up registry key: $key" $colorRed
+        Write-Log "ㅤ┝ Error backing up registry key: $key" $colorRed
     }
 }
 
@@ -104,9 +104,9 @@ function Remove-RegistryKeys {
 
         if (Test-Path -Path $key) {
             Remove-Item -Path $key -Recurse -Force
-            Write-Log "  ┝ Removed registry key: $key" $colorGreen
+            Write-Log "ㅤ┝ Removed registry key: $key" $colorGreen
         } else {
-            Write-Log "  ┝ Registry key not found: $key" $colorRed
+            Write-Log "ㅤ┝ Registry key not found: $key" $colorRed
         }
     }
     Write-Log "--- End cleaning registry ---" $colorYellow
@@ -131,7 +131,7 @@ function Remove-UninstallEntries {
                 Backup-RegistryKey -key $subKey.PSPath -backupPath $backupPath
 
                 Remove-Item -Path $subKey.PSPath -Recurse -Force
-                Write-Log "  ┝ Removed uninstall entry: $displayName" $colorGreen
+                Write-Log "ㅤ┝ Removed uninstall entry: $displayName" $colorGreen
             }
         }
     }
