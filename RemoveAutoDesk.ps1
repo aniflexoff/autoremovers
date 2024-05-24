@@ -10,6 +10,7 @@ $directories = @(
 )
 
 # Цветовые коды ANSI для подсветки
+$env:TERM="xterm"
 $colorReset = "`e[0m"
 $colorGreen = "`e[32m"
 $colorRed = "`e[31m"
